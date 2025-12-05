@@ -1,0 +1,19 @@
+# FastAPI Backend
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database
+sqlmodel==0.0.14
+
+# Vector DB
+chromadb==0.4.18
+numpy<2.0.0  # ChromaDB 0.4.18 requires NumPy < 2.0
+
+# Embeddings
+sentence-transformers>=3.0.0
+
+# LLM
+ollama==0.1.6
+
+# Utilities
+python-dotenv==1.0.0
