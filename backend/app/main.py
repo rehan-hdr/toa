@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.logging_config import setup_logging
 from app.db.session import create_db_and_tables
-from app.routers import chat, tasks, notes, journal
+from app.routers import chat, tasks, notes, journal, graph
 from contextlib import asynccontextmanager
 
 @asynccontextmanager
@@ -26,6 +26,7 @@ app.include_router(chat.router, prefix="/api", tags=["chat"])
 app.include_router(tasks.router, prefix="/api", tags=["tasks"])
 app.include_router(notes.router, prefix="/api", tags=["notes"])
 app.include_router(journal.router, prefix="/api", tags=["journal"])
+app.include_router(graph.router, prefix="/api", tags=["graph"])
 
 @app.get("/health")
 def health():

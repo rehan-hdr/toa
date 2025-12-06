@@ -57,3 +57,38 @@ def update_task_status(task_id: str, status_update: TaskStatusUpdate, db: Sessio
     db.refresh(task)
     logger.info(f"Task {task_id} status updated to {task.status}")
     return {"status": "success", "task_id": task_id, "new_status": task.status}
+
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    priority: int = 1
+    due_date: Optional[str] = None
+    status: str = "todo"
+    tags: Optional[str] = None
+
+@router.post("/tasks")
+def create_task(task_data: TaskCreate, db: Session = Depends(get_session)):
+    logger.info(f"Creating new task: {task_data.title}")
+    task = Task(
+        title=task_data.title,
+        description=task_data.description,
+        priority=task_data.priority,
+        due_date=task_data.due_date,
+        status=task_data.status,
+        tags=task_data.tags
+    )
+    db.add(task)
+    db.commit()
+    db.refresh(task)
+    return task
+
+@router.delete("/tasks/{task_id}")
+def delete_task(task_id: str, db: Session = Depends(get_session)):
+    logger.info(f"Deleting task: {task_id}")
+    task = db.get(Task, task_id)
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+    
+    db.delete(task)
+    db.commit()
+    return {"status": "success", "message": f"Task {task_id} deleted"}

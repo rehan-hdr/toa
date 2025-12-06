@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, CheckSquare, Plus, MessageCircle, BookOpen, StickyNote } from 'lucide-react';
+import { MessageSquare, CheckSquare, Plus, MessageCircle, BookOpen, StickyNote, Share2 } from 'lucide-react';
 import axios from 'axios';
 
 const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversationId }) => {
@@ -16,45 +16,59 @@ const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversa
 
   useEffect(() => {
     fetchConversations();
-    // Refresh list every 5s or add proper state management (simplified for now)
     const interval = setInterval(fetchConversations, 5000);
     return () => clearInterval(interval);
-  }, [conversationId]); // Refresh when conversation changes (e.g. new title)
-
-  const handleNewChat = () => {
-    setConversationId(null);
-    setActiveTab('chat');
-  };
+  }, [conversationId]);
 
   return (
-    <div className="flex h-screen bg-slate-950 text-slate-100 font-sans overflow-hidden">
+    <div className="flex h-screen bg-slate-950 text-slate-200 font-sans selection:bg-orange-500/30">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
-        <div className="p-6 border-b border-slate-800">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-            Nexus
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">Local AI Assistant</p>
-        </div>
+      <div className="w-64 flex flex-col border-r border-slate-800 bg-slate-950">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
+              <span className="font-bold text-white text-lg">N</span>
+            </div>
+            <h1 className="font-bold text-xl tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-500">
+              NEXUS
+            </h1>
+          </div>
 
-        <div className="p-4">
-          <button
-            onClick={handleNewChat}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 text-white transition-colors"
+          <button 
+             onClick={() => {
+                setActiveTab('chat');
+                setConversationId(null);
+             }}
+             className="w-full flex items-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-600 text-white font-medium shadow-lg shadow-orange-600/20 hover:from-orange-500 hover:to-amber-500 transition-all duration-200 group"
           >
-            <Plus size={18} />
-            <span className="font-medium">New Chat</span>
+            <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
+            <span>New Chat</span>
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-4 space-y-6">
-          {/* Main Nav */}
-          <div className="space-y-2">
-             <button
+        <div className="flex-1 overflow-y-auto px-4 space-y-2">
+          <div className="mb-6 space-y-1">
+            <h3 className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+              Workspace
+            </h3>
+            
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === 'chat'
+                  ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <MessageSquare size={20} />
+              <span className="font-medium">Chat</span>
+            </button>
+
+            <button
               onClick={() => setActiveTab('tasks')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 activeTab === 'tasks'
-                  ? 'bg-purple-600/10 text-purple-400 border border-purple-600/20'
+                  ? 'bg-orange-500/10 text-orange-500 border border-orange-500/20'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
@@ -66,33 +80,45 @@ const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversa
               onClick={() => setActiveTab('notes')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 activeTab === 'notes'
-                  ? 'bg-yellow-600/10 text-yellow-400 border border-yellow-600/20'
+                  ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
-              <MessageSquare size={20} />
+              <StickyNote size={20} />
               <span className="font-medium">Notes</span>
             </button>
-            
-             <button
+
+            <button
               onClick={() => setActiveTab('journal')}
               className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                 activeTab === 'journal'
-                  ? 'bg-pink-600/10 text-pink-400 border border-pink-600/20'
+                  ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20'
                   : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
               }`}
             >
-              <MessageSquare size={20} />
+              <BookOpen size={20} />
               <span className="font-medium">Journal</span>
+            </button>
+            
+             <button
+              onClick={() => setActiveTab('graph')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === 'graph'
+                  ? 'bg-cyan-600/10 text-cyan-400 border border-cyan-600/20'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <Share2 size={20} />
+              <span className="font-medium">Mind Map</span>
             </button>
           </div>
 
           {/* History */}
           <div>
-            <h3 className="text-xs font-semibold text-slate-500 mb-3 px-2 uppercase tracking-wider">
+            <h3 className="px-4 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
               History
             </h3>
-            <div className="space-y-1">
+             <div className="space-y-1">
               {conversations.map((conv) => (
                 <button
                   key={conv.id}
@@ -102,7 +128,7 @@ const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversa
                   }}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-left transition-all duration-200 ${
                     conversationId === conv.id
-                      ? 'bg-slate-800 text-blue-400'
+                      ? 'bg-slate-800 text-orange-400 border border-slate-700'
                       : 'text-slate-400 hover:bg-slate-800 hover:text-slate-300'
                   }`}
                 >
@@ -112,18 +138,18 @@ const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversa
               ))}
             </div>
           </div>
-        </nav>
+        </div>
 
-        <div className="p-4 border-t border-slate-800">
+         <div className="p-4 border-t border-slate-800 bg-slate-950">
           <div className="flex items-center gap-3 px-4 py-2 rounded-lg bg-slate-900/50 border border-slate-800">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-slate-400">System Online</span>
+            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+            <span className="text-xs text-slate-400 font-medium">System Online</span>
           </div>
         </div>
-      </aside>
+      </div>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col relative overflow-hidden">
+      <main className="flex-1 flex flex-col relative overflow-hidden bg-slate-950">
         {children}
       </main>
     </div>

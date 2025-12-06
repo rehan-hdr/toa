@@ -77,7 +77,7 @@ const NotesView = () => {
         {!isCreating && (
           <button
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-500 hover:to-orange-500 text-white rounded-lg transition-all shadow-lg shadow-amber-900/20"
           >
             <Plus size={18} />
             <span>New Note</span>
@@ -86,9 +86,9 @@ const NotesView = () => {
       </div>
 
       {isCreating && (
-        <div className="mb-8 p-6 bg-slate-900 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-top-4">
+        <div className="mb-8 p-6 bg-slate-900 rounded-xl border border-slate-800 animate-in fade-in slide-in-from-top-4 shadow-2xl shadow-amber-900/10">
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-lg font-semibold text-blue-400">
+            <h3 className="text-lg font-semibold text-amber-500">
               {editingId ? 'Edit Note' : 'Create Note'}
             </h3>
             <button onClick={resetForm} className="text-slate-500 hover:text-white">
@@ -102,20 +102,20 @@ const NotesView = () => {
               placeholder="Note Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50"
             />
             <textarea
               placeholder="Write your note here..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full h-48 bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 resize-none"
+              className="w-full h-48 bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 resize-none"
             />
             <input
               type="text"
               placeholder="Tags (comma separated)"
               value={tags}
               onChange={(e) => setTags(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-2 text-sm text-slate-300 focus:outline-none focus:border-amber-500/50"
             />
             <div className="flex justify-end gap-3">
               <button 
@@ -127,7 +127,7 @@ const NotesView = () => {
               <button
                 onClick={handleSave}
                 disabled={!title || !content}
-                className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-6 py-2 bg-amber-600 hover:bg-amber-500 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors shadow-lg shadow-amber-900/20"
               >
                 <Save size={18} />
                 <span>Save Note</span>
@@ -145,19 +145,19 @@ const NotesView = () => {
           </div>
         ) : (
           notes.map((note) => (
-            <div key={note.id} className="group bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-blue-500/50 transition-all hover:shadow-lg hover:shadow-blue-900/10">
+            <div key={note.id} className="group bg-slate-900 border border-slate-800 rounded-xl p-5 hover:border-amber-500/30 transition-all hover:shadow-lg hover:shadow-amber-900/10">
               <div className="flex justify-between items-start mb-3">
-                <h3 className="font-semibold text-lg text-slate-100 line-clamp-1">{note.title}</h3>
+                <h3 className="font-semibold text-lg text-slate-100 line-clamp-1 group-hover:text-amber-400 transition-colors">{note.title}</h3>
                 <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button 
                     onClick={() => handleEdit(note)}
-                    className="p-1.5 hover:bg-slate-800 rounded text-blue-400"
+                    className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-amber-400"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button 
                     onClick={() => handleDelete(note.id)}
-                    className="p-1.5 hover:bg-slate-800 rounded text-red-400"
+                    className="p-1.5 hover:bg-slate-800 rounded text-slate-400 hover:text-red-400"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -172,7 +172,7 @@ const NotesView = () => {
                 {note.tags && (
                   <div className="flex gap-1">
                     {note.tags.split(',').slice(0, 2).map((tag, i) => (
-                      <span key={i} className="text-xs px-2 py-0.5 bg-slate-800 rounded-full text-blue-400 border border-slate-700">
+                      <span key={i} className="text-xs px-2 py-0.5 bg-amber-500/10 rounded-full text-amber-500 border border-amber-500/20">
                         {tag.trim()}
                       </span>
                     ))}

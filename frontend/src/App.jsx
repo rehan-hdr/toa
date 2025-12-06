@@ -4,6 +4,7 @@ import ChatInterface from './components/ChatInterface';
 import TaskList from './components/TaskList';
 import NotesView from './components/NotesView';
 import JournalView from './components/JournalView';
+import MindMapView from './components/MindMapView';
 
 function App() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -25,6 +26,7 @@ function App() {
       {activeTab === 'tasks' && <TaskList />}
       {activeTab === 'notes' && <NotesView />}
       {activeTab === 'journal' && <JournalView />}
+      {activeTab === 'graph' && <MindMapView />}
     </Layout>
   );
 }

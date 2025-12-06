@@ -64,7 +64,7 @@ const JournalView = () => {
         {!isCreating && (
           <button
             onClick={() => setIsCreating(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-600 to-pink-600 hover:from-orange-500 hover:to-pink-500 text-white rounded-lg transition-colors shadow-lg shadow-orange-900/20"
           >
             <Plus size={18} />
             <span>New Entry</span>
@@ -75,15 +75,15 @@ const JournalView = () => {
       <div className="flex gap-6 h-full overflow-hidden">
         {/* Creation Panel */}
         {isCreating && (
-          <div className="w-1/2 flex flex-col bg-slate-900 rounded-xl border border-slate-800 p-6 animate-in slide-in-from-left-4">
-            <h3 className="text-lg font-semibold text-purple-400 mb-4">New Entry</h3>
+          <div className="w-1/2 flex flex-col bg-slate-900 rounded-xl border border-slate-800 p-6 animate-in slide-in-from-left-4 shadow-2xl">
+            <h3 className="text-lg font-semibold text-orange-400 mb-4">New Entry</h3>
             
             <input
               type="text"
               placeholder="Entry Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white mb-4 focus:outline-none focus:border-purple-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white mb-4 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50"
             />
             
             <div className="flex gap-4 mb-4">
@@ -93,7 +93,7 @@ const JournalView = () => {
                   onClick={() => setMood(m)}
                   className={`flex-1 py-2 rounded-lg border flex justify-center items-center gap-2 transition-all ${
                     mood === m 
-                      ? 'bg-slate-800 border-purple-500 text-white' 
+                      ? 'bg-slate-800 border-orange-500 text-white shadow-lg shadow-orange-900/10' 
                       : 'border-slate-800 text-slate-500 hover:bg-slate-800'
                   }`}
                 >
@@ -107,7 +107,7 @@ const JournalView = () => {
               placeholder="What's on your mind?"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 resize-none mb-4"
+              className="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 resize-none mb-4"
             />
 
             <div className="flex justify-end gap-3">
@@ -120,7 +120,7 @@ const JournalView = () => {
               <button
                 onClick={handleSave}
                 disabled={!title || !content}
-                className="flex items-center gap-2 px-6 py-2 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white rounded-lg"
+                className="flex items-center gap-2 px-6 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white rounded-lg shadow-lg shadow-orange-900/20"
               >
                 <Save size={18} />
                 <span>Save Entry</span>
@@ -140,7 +140,7 @@ const JournalView = () => {
              entries.map((entry, idx) => (
                 <div key={entry.id} className="relative pl-8 border-l border-slate-800 last:border-0">
                   <div className="absolute -left-3 top-0 w-6 h-6 rounded-full bg-slate-900 border border-slate-700 flex items-center justify-center">
-                    <div className="w-2 h-2 rounded-full bg-purple-500" />
+                    <div className="w-2 h-2 rounded-full bg-orange-500" />
                   </div>
                   
                   <div className="mb-1 flex items-center gap-4">
@@ -150,13 +150,13 @@ const JournalView = () => {
                     <MoodIcon mood={entry.mood} size={16} />
                      <button 
                         onClick={() => handleDelete(entry.id)}
-                        className="opacity-0 hover:opacity-100 p-1 text-red-500 transition-opacity"
+                        className="opacity-0 hover:opacity-100 p-1 text-slate-500 hover:text-red-500 transition-all"
                      >
                        <Trash2 size={14} />
                      </button>
                   </div>
                   
-                  <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-800/50 hover:border-slate-700 transition-colors">
+                  <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-800/50 hover:border-orange-500/30 transition-all hover:shadow-lg hover:shadow-orange-900/10">
                     <h3 className="text-lg font-semibold text-slate-200 mb-2">{entry.title}</h3>
                     <p className="text-slate-400 whitespace-pre-wrap leading-relaxed">
                       {entry.content}
