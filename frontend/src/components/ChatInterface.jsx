@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, Bot, User, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
-const ChatInterface = () => {
+const ChatInterface = ({ conversationId, setConversationId }) => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +16,25 @@ const ChatInterface = () => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const loadConversation = async () => {
+      if (conversationId) {
+        setIsLoading(true);
+        try {
+          const res = await axios.get(`/api/conversations/${conversationId}/messages`);
+          setMessages(res.data);
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setIsLoading(false);
+        }
+      } else {
+        setMessages([]);
+      }
+    };
+    loadConversation();
+  }, [conversationId]);
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -26,14 +45,23 @@ const ChatInterface = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('/api/chat', { message: userMessage.content });
+      const response = await axios.post('/api/chat', { 
+        message: userMessage.content,
+        conversation_id: conversationId 
+      });
+      
       const aiMessage = { 
         role: 'assistant', 
         content: response.data.response,
         category: response.data.category,
-        summary: response.data.summary
+        summary: response.data.summary,
+        produced_task: response.data.produced_task
       };
       setMessages(prev => [...prev, aiMessage]);
+      
+      if (!conversationId && response.data.conversation_id) {
+        setConversationId(response.data.conversation_id);
+      }
     } catch (error) {
       console.error('Error sending message:', error);
       setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error processing your request.' }]);
@@ -70,6 +98,23 @@ const ChatInterface = () => {
                 : 'bg-slate-900 text-slate-100 border border-slate-800'
             }`}>
               <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+              
+              {/* Task Card in Chat */}
+              {msg.produced_task && (
+                <div className="mt-3 bg-slate-950/50 rounded-lg p-3 border border-slate-800/50">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    <span className="font-medium text-blue-400">Task Created</span>
+                  </div>
+                  <div className="pl-4 border-l-2 border-slate-800">
+                    <p className="font-medium text-slate-200">{msg.produced_task.title}</p>
+                    {msg.produced_task.due_date && (
+                      <p className="text-xs text-slate-500 mt-1">Due: {new Date(msg.produced_task.due_date).toLocaleDateString()}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {msg.category && (
                 <div className="mt-2 pt-2 border-t border-slate-800/50 flex items-center gap-2">
                   <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
