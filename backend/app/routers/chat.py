@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 from app.db.session import get_session
-from app.models import Message, Task, Conversation
+from app.models import Message, Task, Conversation, Note, JournalEntry
 from app.services.llm import generate_response
 from app.services.rag import rag_service
 from app.core.logging_config import logger
@@ -28,11 +28,13 @@ You strictly output valid JSON only. No markdown, no explanations.
 
 Instructions:
 1. "task": If user implies a future action (remind, schedule, I need to, todo), use "category": "task" and fill "task" object.
-2. "chat": For general conversation.
+2. "note": If user wants to save information/thoughts (note this, remember that, save note), use "category": "note" and fill "note" object.
+3. "journal": If user is reflecting, expressing feelings, or says "dear diary", use "category": "journal" and fill "journal" object.
+4. "chat": For general conversation.
 
 JSON Schema:
 {
-  "category": "task" | "choice",
+  "category": "task" | "note" | "journal" | "chat",
   "reply": "assistant response string",
   "summary": "short summary string",
   "task": {
@@ -41,12 +43,26 @@ JSON Schema:
     "priority": "int 1-5",
     "subtasks": ["string"] or null,
     "estimate_hours": "float"
+  },
+  "note": {
+    "title": "string",
+    "content": "string",
+    "tags": "comma separated string"
+  },
+  "journal": {
+    "title": "string",
+    "content": "string",
+    "mood": "happy|neutral|sad"
   }
 }
 
 Example Task:
 User: "Remind me to clean"
-Output: {"category": "task", "reply": "Added task.", "summary": "Clean", "task": {"title": "Clean", "due_date": null, "priority": 3, "subtasks": null, "estimate_hours": 1.0}}
+Output: {"category": "task", "reply": "Added task.", "summary": "Clean", "task": {"title": "Clean", "due_date": null, "priority": 3, "subtasks": null, "estimate_hours": 1.0}, "note": null, "journal": null}
+
+Example Note:
+User: "Note that the code is in python"
+Output: {"category": "note", "reply": "Saved note.", "summary": "Code lang", "task": null, "note": {"title": "Code Language", "content": "The code is in python", "tags": "coding, python"}, "journal": null}
 """
 
 class ConversationResponse(BaseModel):
@@ -118,8 +134,25 @@ async def chat(request: ChatRequest, db: Session = Depends(get_session)):
         tasks = db.exec(
             select(Task).where(Task.status.in_(["todo", "in_progress"])).limit(10)
         ).all()
-        logger.info(f"Found {len(tasks)} active tasks for context")
         tasks_str = "\n".join([f"- {t.title} (Priority: {t.priority}, Status: {t.status})" for t in tasks]) if tasks else "No active tasks"
+
+        # Fetch recently completed tasks
+        done_tasks = db.exec(
+            select(Task).where(Task.status == "done").order_by(Task.updated_at.desc()).limit(5)
+        ).all()
+        done_str = "\n".join([f"- {t.title} (Completed: {t.updated_at.strftime('%Y-%m-%d')})" for t in done_tasks]) if done_tasks else "No recently completed tasks"
+
+        # Fetch recent notes
+        recent_notes = db.exec(
+            select(Note).order_by(Note.updated_at.desc()).limit(5)
+        ).all()
+        notes_str = "\n".join([f"- {n.title}: {n.content[:50]}..." for n in recent_notes]) if recent_notes else "No recent notes"
+
+        # Fetch recent journal
+        recent_journal = db.exec(
+            select(JournalEntry).order_by(JournalEntry.created_at.desc()).limit(3)
+        ).all()
+        journal_str = "\n".join([f"- {j.created_at.strftime('%Y-%m-%d')}: {j.title} ({j.mood or 'No mood'})" for j in recent_journal]) if recent_journal else "No recent journal entries"
 
         # Fetch recent history for context (last 5 messages)
         logger.debug(f"Fetching chat history for conversation: {conversation_id}")
@@ -138,6 +171,15 @@ async def chat(request: ChatRequest, db: Session = Depends(get_session)):
 
 Current Active Tasks:
 {tasks_str}
+
+Recently Completed Tasks:
+{done_str}
+
+Recent Notes:
+{notes_str}
+
+Recent Journal Entries:
+{journal_str}
 
 Chat History:
 {history_str}
@@ -181,7 +223,9 @@ User Message: {request.message}"""
         )
         db.add(asst_msg)
         
+        # Handle Categories
         produced_task = None
+        
         if category == "task" and "task" in result:
              task_data = result["task"]
              logger.info(f"LLM produced a task: {task_data.get('title')}")
@@ -208,6 +252,30 @@ User Message: {request.message}"""
                  "subtasks": task.get_subtasks(),
                  "estimate_hours": task.estimate_hours
              }
+             
+        elif category == "note" and "note" in result:
+            note_data = result["note"]
+            if note_data:
+                logger.info(f"LLM produced a note: {note_data.get('title')}")
+                note = Note(
+                    title=note_data.get("title", "Untitled Note"),
+                    content=note_data.get("content", request.message),
+                    tags=note_data.get("tags")
+                )
+                db.add(note)
+                db.commit()
+            
+        elif category == "journal" and "journal" in result:
+            journal_data = result["journal"]
+            if journal_data:
+                logger.info(f"LLM produced a journal entry: {journal_data.get('title')}")
+                entry = JournalEntry(
+                    title=journal_data.get("title", "Daily Entry"),
+                    content=journal_data.get("content", request.message),
+                    mood=journal_data.get("mood", "neutral")
+                )
+                db.add(entry)
+                db.commit()
 
         # Save to RAG
         rag_service.add_document(f"User: {request.message}\nAssistant: {response_text}")

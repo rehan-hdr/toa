@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import ChatInterface from './components/ChatInterface';
 import TaskList from './components/TaskList';
+import NotesView from './components/NotesView';
+import JournalView from './components/JournalView';
 
 function App() {
   const [activeTab, setActiveTab] = useState('chat');
@@ -14,14 +16,15 @@ function App() {
       conversationId={conversationId}
       setConversationId={setConversationId}
     >
-      {activeTab === 'chat' ? (
+      {activeTab === 'chat' && (
         <ChatInterface 
           conversationId={conversationId} 
           setConversationId={setConversationId}
         />
-      ) : (
-        <TaskList />
       )}
+      {activeTab === 'tasks' && <TaskList />}
+      {activeTab === 'notes' && <NotesView />}
+      {activeTab === 'journal' && <JournalView />}
     </Layout>
   );
 }

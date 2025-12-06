@@ -57,7 +57,18 @@ class Task(SQLModel, table=True):
 class Note(SQLModel, table=True):
     """Store notes (non-task content)"""
     id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str = Field(default="Untitled Note")
     content: str
-    summary: Optional[str] = None
+    tags: Optional[str] = None # Comma separated
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    source_message_id: Optional[UUID] = None
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class JournalEntry(SQLModel, table=True):
+    """Store journal entries"""
+    id: UUID = Field(default_factory=uuid4, primary_key=True)
+    title: str = Field(default="Daily Entry")
+    content: str
+    mood: Optional[str] = None
+    tags: Optional[str] = None # Comma separated
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)

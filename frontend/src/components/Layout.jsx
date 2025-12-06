@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { MessageSquare, CheckSquare, Plus, MessageCircle } from 'lucide-react';
+import { MessageSquare, CheckSquare, Plus, MessageCircle, BookOpen, StickyNote } from 'lucide-react';
 import axios from 'axios';
 
 const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversationId }) => {
@@ -60,6 +60,30 @@ const Layout = ({ children, activeTab, setActiveTab, conversationId, setConversa
             >
               <CheckSquare size={20} />
               <span className="font-medium">Tasks</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('notes')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === 'notes'
+                  ? 'bg-yellow-600/10 text-yellow-400 border border-yellow-600/20'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <MessageSquare size={20} />
+              <span className="font-medium">Notes</span>
+            </button>
+            
+             <button
+              onClick={() => setActiveTab('journal')}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                activeTab === 'journal'
+                  ? 'bg-pink-600/10 text-pink-400 border border-pink-600/20'
+                  : 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              }`}
+            >
+              <MessageSquare size={20} />
+              <span className="font-medium">Journal</span>
             </button>
           </div>
 
