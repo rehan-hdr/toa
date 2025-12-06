@@ -133,6 +133,9 @@ After testing, check the database:
 # Install sqlite3 if not available
 # Windows: Download from https://sqlite.org/download.html
 
+for wahaj:
+& "C:\sqlite\sqlite3.exe" nexus.db
+
 # Open database
 sqlite3 nexus.db
 
